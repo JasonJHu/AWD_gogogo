@@ -16,7 +16,7 @@ python3 main.py
 
 - **init_ip.py：**  生成IP池，校验index.php是否存在  
 
-    - **核对本文件，确认靶机范围和白名单IP**
+    - ⚠️**核对本文件，确认靶机范围和白名单IP**
     
 - **init_shell.py：**  shell清单维护,可选择get/post两种方式，eval/system两种函数调用
     
@@ -24,7 +24,7 @@ python3 main.py
 
     - 支持直接获取flag/自动定时获取flag/上传shell目录中木马/执行自定义命令 
     
-    - **核对本文件中靶机flag存放位置以及正则匹配式**
+    - ⚠️**核对本文件中靶机flag存放位置以及正则匹配式**
  
 - **common.py：**  公用函数库
     
