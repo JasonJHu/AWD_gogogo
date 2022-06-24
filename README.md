@@ -54,4 +54,4 @@ python3 main.py
     
 ## 更新日志
 
-* 20220623 修订exp_shell的getFlag函数，增加访问失败后重试次数和间隔时间
+[v0.2](https://github.com/JasonJHu/AWD_gogogo/releases/tag/v0.2) 基本功能完成
