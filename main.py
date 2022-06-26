@@ -1,4 +1,4 @@
-﻿import init_ip
+import init_ip
 import init_shell
 import exp_shell
 import time
@@ -6,12 +6,13 @@ import sys
 
 strCMD=""
 
+
 if __name__ == '__main__':
     while 1:
         localtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         
         print("*"*10+localtime+"*"*10)
-        print("欢迎使用匿名战队内部工具——AWD攻击框架v0.2")
+        print("欢迎使用宁大附院CTF战队工具——AWD攻击框架")
         print("现有模块：")
         print("1.资产维护    2.shell维护    3.shell利用")
         print("0.退出")
