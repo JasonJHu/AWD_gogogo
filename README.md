@@ -39,3 +39,5 @@ python3 main.py
 ## 更新日志
 
 [v0.2](https://github.com/JasonJHu/AWD_gogogo/releases/tag/v0.2) 基本功能完成
+
+20220629 尝试GUI框架重构，完成界面展示/靶机扫描/参数设置功能
