@@ -17,7 +17,7 @@ def file_load(filepath):
         return False
 
 def file_write(filepath, filecontent):
-    file = open(filepath, "a")
+    file = open(filepath, "a", encoding='utf-8')
     file.write(filecontent+"\n")
     file.close()
 
